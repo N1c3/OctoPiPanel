@@ -53,23 +53,21 @@ import datetime
 from pygame.locals import *
 from collections import deque
 from ConfigParser import RawConfigParser
- 
+
 class OctoPiPanel():
     """
     @var done: anything can set to True to forcequit
     @var screen: points to: pygame.display.get_surface()        
     """
-
-    # Read settings from OctoPiPanel.cfg settings file
+    
     cfg = RawConfigParser()
-    scriptDirectory = os.path.dirname(os.path.realpath(__file__))
-    settingsFilePath = os.path.join(scriptDirectory, "OctoPiPanel.cfg")
-    cfg.readfp(open(settingsFilePath,"r"))
+    cfg.read(r'OctoPiPanel.cfg')
 
     api_baseurl = cfg.get('settings', 'baseurl')
     apikey = cfg.get('settings', 'apikey')
     updatetime = cfg.getint('settings', 'updatetime')
     backlightofftime = cfg.getint('settings', 'backlightofftime')
+
 
     addkey = '?apikey={0}'.format(apikey)
     apiurl_printhead = '{0}/api/printer/printhead'.format(api_baseurl)
@@ -121,11 +119,14 @@ class OctoPiPanel():
         #print self.BedTempList
        
         if platform.system() == 'Linux':
-            # Init framebuffer/touchscreen environment variables
+            print "LowVideo"
+            # Init framebuffer/touchscreen environment variables)
             os.putenv('SDL_VIDEODRIVER', 'fbcon')
             os.putenv('SDL_FBDEV'      , '/dev/fb1')
+            #os.putenv('SDL_FBDEV'      , '/dev/fb0')
             os.putenv('SDL_MOUSEDRV'   , 'TSLIB')
-            os.putenv('SDL_MOUSEDEV'   , '/dev/input/touchscreen')
+            #os.putenv('SDL_MOUSEDEV'   , '/dev/input/touchscreen')
+            os.putenv('SDL_MOUSEDEV'   , '/dev/input/mouse0')
 
         # init pygame and set up screen
         pygame.init()
@@ -142,9 +143,9 @@ class OctoPiPanel():
 
         # Set font
         #self.fntText = pygame.font.Font("Cyberbit.ttf", 12)
-        self.fntText = pygame.font.Font(os.path.join(self.scriptDirectory, "Cyberbit.ttf"), 12)
+        self.fntText = pygame.font.Font("Cyberbit.ttf", 12)
         self.fntText.set_bold(True)
-        self.fntTextSmall = pygame.font.Font(os.path.join(self.scriptDirectory, "Cyberbit.ttf"), 10)
+        self.fntTextSmall = pygame.font.Font("Cyberbit.ttf", 10)
         self.fntTextSmall.set_bold(True)
 
         # backlight on off status and control
@@ -175,15 +176,8 @@ class OctoPiPanel():
             os.system("echo 252 > /sys/class/gpio/export")
             os.system("echo 'out' > /sys/class/gpio/gpio252/direction")
             os.system("echo '1' > /sys/class/gpio/gpio252/value")
-
-        # Init of class done
-        print "OctoPiPanel initiated"
    
     def Start(self):
-        # OctoPiPanel started
-        print "OctoPiPanel started!"
-        print "---"
-        
         """ game loop: input, move, render"""
         while not self.done:
             # Handle events
@@ -211,9 +205,6 @@ class OctoPiPanel():
         # enable the backlight before quiting
         if platform.system() == 'Linux':
             os.system("echo '1' > /sys/class/gpio/gpio252/value")
-            
-        # OctoPiPanel is going down.
-        print "OctoPiPanel is going down."
 
         """ Quit """
         pygame.quit()
@@ -230,8 +221,6 @@ class OctoPiPanel():
                     print "Got escape key"
 		    self.done = True
 
-                # Look for specific keys.
-                #  Could be used if a keyboard is connected
                 if event.key == pygame.K_a:
                     print "Got A key"
 
@@ -488,24 +477,18 @@ class OctoPiPanel():
 
     def _home_xy(self):
         data = { "command": "home", "axes": ["x", "y"] }
-
-        # Send command
         self._sendAPICommand(self.apiurl_printhead, data)
 
         return
 
     def _home_z(self):
         data = { "command": "home", "axes": ["z"] }
-
-        # Send command
         self._sendAPICommand(self.apiurl_printhead, data)
 
         return
 
     def _z_up(self):
         data = { "command": "jog", "x": 0, "y": 0, "z": 25 }
-
-        # Send command
         self._sendAPICommand(self.apiurl_printhead, data)
 
         return
