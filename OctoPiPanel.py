@@ -119,8 +119,9 @@ class OctoPiPanel():
         #print self.BedTempList
        
         if platform.system() == 'Linux':
-            print "LowVideo"
-            # Init framebuffer/touchscreen environment variables)
+            #print "LowVideo"
+            # Init framebuffer/touchscreen environment variables
+            #os.putenv('SDL_VIDEODRIVER', 'xinput')
             os.putenv('SDL_VIDEODRIVER', 'fbcon')
             os.putenv('SDL_FBDEV'      , '/dev/fb1')
             #os.putenv('SDL_FBDEV'      , '/dev/fb0')
