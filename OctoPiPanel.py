@@ -119,22 +119,20 @@ class OctoPiPanel():
         #print self.BedTempList
        
         if platform.system() == 'Linux':
-            #print "LowVideo"
+            print "LowVideo"
             # Init framebuffer/touchscreen environment variables
-            #os.putenv('SDL_VIDEODRIVER', 'xinput')
             os.putenv('SDL_VIDEODRIVER', 'fbcon')
             os.putenv('SDL_FBDEV'      , '/dev/fb1')
-            #os.putenv('SDL_FBDEV'      , '/dev/fb0')
             os.putenv('SDL_MOUSEDRV'   , 'TSLIB')
-            #os.putenv('SDL_MOUSEDEV'   , '/dev/input/touchscreen')
-            os.putenv('SDL_MOUSEDEV'   , '/dev/input/mouse0')
+            os.putenv('SDL_MOUSEDEV'   , '/dev/input/event3')
 
         # init pygame and set up screen
         pygame.init()
         if platform.system() == 'Windows':
             pygame.mouse.set_visible(True)
         else:
-            pygame.mouse.set_visible(False)
+            pass
+            #pygame.mouse.set_visible(False)
 
         self.width, self.height = width, height
         self.screen = pygame.display.set_mode( (width,height) )
